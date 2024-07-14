@@ -6,7 +6,7 @@ Additional checks beside botd result.bot:
 * mouse movement
 * keyboard press
 * cpu cores
-* ip country
+* ip geolocation
 * working hours
 * user agent
 
