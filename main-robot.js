@@ -31,22 +31,26 @@ function isHuman(botdResult, ipInfo){
     const ipCheckResult = isValidGeolocation(ipInfo);
     const userAgentCheckResult = isValidUserAgent();
     const workingHoursResult = workingHours();
+    const canvasFingerprintResult = isValidCanvasFingerprint();
 
     console.log('botd result: '+ botdResult.bot);
     console.log('mouse result: '+ hasMouseMoved);
     console.log('keypress result: '+ hasKeyPressed);
     console.log('logical CPU cores: ' + navigator.hardwareConcurrency);
-    console.log('IP Info: ', ipInfo);
     console.log('IP check: ', ipCheckResult);
     console.log('User-Agent: ', userAgentCheckResult);
     console.log('workingHours: ', workingHoursResult);
+    console.log('Canvas Fingerprint: ', canvasFingerprintResult);
 
     // definately human
     if(hasMouseMoved ){
         logHuman();
     }
-    // most probably human
-    if(!botdResult.bot && navigator.hardwareConcurrency > 2 && ipCheckResult && userAgentCheckResult && workingHoursResult){
+    // most probably human with ip check
+    // if(!botdResult.bot && navigator.hardwareConcurrency > 2 && ipCheckResult && userAgentCheckResult && workingHoursResult){
+    //     logHuman();
+    // }
+    if(!botdResult.bot && navigator.hardwareConcurrency > 2 && userAgentCheckResult && workingHoursResult && canvasFingerprintResult){
         logHuman();
     }
     else{
@@ -107,6 +111,63 @@ function workingHours() {
     console.log(isDayAllowed , isMonthAllowed , isYearAllowed, isTimeAllowed)
     
     return isDayAllowed && isMonthAllowed && isYearAllowed && isTimeAllowed;
+}
+
+function generateCanvasFingerprint() {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    // Draw some text
+    ctx.textBaseline = 'top';
+    ctx.font = '14px Arial';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillStyle = '#f60';
+    ctx.fillRect(125, 1, 62, 20);
+    ctx.fillStyle = '#069';
+    ctx.fillText('Hello, World!', 2, 15);
+    ctx.fillStyle = 'rgba(102, 204, 0, 0.7)';
+    ctx.fillText('Hello, World!', 4, 17);
+
+    // Draw a rectangle
+    ctx.strokeStyle = 'rgba(120, 186, 176, 0.5)';
+    ctx.strokeRect(50, 50, 100, 100);
+
+    // Additional drawing to make fingerprint more unique
+    ctx.beginPath();
+    ctx.arc(75, 75, 50, 0, Math.PI * 2, true);
+    ctx.closePath();
+    ctx.stroke();
+
+    // Get the data URL
+    const dataURL = canvas.toDataURL();
+    return dataURL;
+}
+
+function hashString(str) {
+    let hash = 0;
+    if (str.length === 0) return hash;
+    for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = (hash << 5) - hash + char;
+        hash |= 0; // Convert to 32bit integer
+    }
+    return hash;
+}
+
+function isValidCanvasFingerprint() {
+    const fingerprint = generateCanvasFingerprint();
+    const fingerprintHash = hashString(fingerprint);
+
+    console.log('Canvas Fingerprint Hash:', fingerprintHash);
+
+    // Example logic: If the hash matches known human browser hash patterns, it's a human
+    const knownHumanHashes = [
+        // These hashes should be precomputed from known human browsers
+        -2051175225,  // Example hash, replace with actual hashes
+        1234567890    // Example hash, replace with actual hashes
+    ];
+
+    return knownHumanHashes.includes(fingerprintHash);
 }
 
 
