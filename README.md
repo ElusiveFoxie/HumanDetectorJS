@@ -9,4 +9,5 @@ Additional checks beside botd result.bot:
 * ip geolocation
 * working hours
 * user agent
+* canvas fingerprinting 
 
